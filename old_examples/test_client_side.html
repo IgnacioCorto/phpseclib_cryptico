@@ -1,0 +1,65 @@
+<script src="node_modules/cryptico-js/dist/cryptico.browser.min.js"></script>
+
+<script>
+function fnGetParams(rsa){
+	let keys = ['n','e','d','p','q','dmp1','dmq1','coeff'];
+	p = {}
+	for(key of keys)
+		if(rsa[key])
+			p[key] = rsa[key].toString(16);
+	return p;		
+}
+
+var PassPhrase = "The Moon is a Harsh Mistress."; 
+var Bits = 512; 
+var MattsRSAkey = cryptico.generateRSAKey(PassPhrase, Bits);
+
+var MattsPublicKeyString = cryptico.publicKeyString(MattsRSAkey);  
+
+var PlainText = "Matt, I need you to help me with my Starcraft strategy.";
+
+var EncryptionResult = cryptico.encrypt(PlainText, MattsPublicKeyString);
+var DecryptionResult = cryptico.decrypt(EncryptionResult.cipher, MattsRSAkey);
+
+document.write('<pre>'
+	+ JSON.stringify(EncryptionResult) +'\n'
+	+ JSON.stringify(DecryptionResult) +'\n'
+	+ MattsPublicKeyString +'\n'
+	+ EncryptionResult.cipher +'\n'
+	+ JSON.stringify(fnGetParams(MattsRSAkey)) +'\n'
+	+ '<pre>');
+
+
+document.write('<pre>***'+DecryptionResult.plaintext+'***<pre>'); 
+
+
+p = fnGetParams(MattsRSAkey);
+// p = {"n":"a86812e26e693f6623e40ac0876d3528f564cef2e813c29efd537f7afe0f32a5cef3c0c3c8d508b2e6ffe7a42b891a291f29a74b9fcf0fd780e3af01c16c6f8b","e":"010001","p":"dd909a0ea5f36b8eb822376ad279f7d729264ac6261f211a79b3b5ab97e5e28b","q":"c294767a073bc12109e475abb44c3d0af1ac003c8039a65c6f30c60c87564701","dmp1":"bc480162a94b6dff5e22558d8546f881f30a0348d76464b126f2bc531145dd79","dmq1":"aeeb4dd2875c2552f114aadfaf9675adb7f1dac888b0caa7ffe105b94f94b501","coeff":"88cfd421d1e2cd1b2eefff9fa02d11f7bac3246bbac54a7db3272b0f0b8bcbd5","d":"28685867a650709ae46fba38ba05f5246fc51176ed42988727879a65fb81d007df074ef7cfc97b41f1e42f2d7f641839730c3723775fef3be61ca0c4c13ace01"}
+
+var public = new cryptico.RSAKey();
+public.setPublic(p.n, p.e);
+
+var private = new cryptico.RSAKey();
+private.setPrivateEx(p.n, p.e, p.d, p.p, p.q, p.dmp1, p.dmq1, p.coeff);
+
+var private_json = JSON.stringify(fnGetParams(private));
+var public_json = JSON.stringify(fnGetParams(public));
+
+document.write('<pre>'
+	+'PUBLIC: '+public_json
+	+'\n'
+	+'PRIVATE: '+private_json
+	+'<pre>'); 
+
+
+var public_string = cryptico.publicKeyString(public);
+var pub_enc = cryptico.encrypt(PlainText, public);
+var pub_dec = cryptico.decrypt(pub_enc.cipher, private);
+
+
+document.write('<pre>'
+	+'public_string: ' + public_string + '\n'
+	+'decrypted: ***' + DecryptionResult.plaintext + '***\n'
+	+'<pre>'); 
+
+</script>

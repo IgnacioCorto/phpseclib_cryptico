@@ -1,0 +1,50 @@
+<script src="node_modules/cryptico-js/dist/cryptico.browser.min.js"></script>
+
+<pre>
+
+<script  charset="UTF-8">
+let p = {
+	n: "6a69b74f1d11a927784adfb7e148e55f620bbac146738c4a87edf0ad749f98491e8e7ca5039f50616f9a4cbfabc2bb39a57f8354bc3dcaa1b32cf4dfcf16fe63",
+	e: "3",
+	d: "46f124df68b670c4fadc952540db4394ec07d1d62ef7b2dc5a9ea073a315102fe07199089f991027e8f5c0a5ac1062af121208f85bff55cb65a14d8a9bf24e2b",
+	p: "c006e6c6213c6e93615269192ce57b283f497644857876bf584ba68501b35683",
+	q: "8ddd3051f2fd499230d742adfcc4ac0acb1aff9bacc65331426f5a0ae37832a1",
+	dmp1: "800499d96b7d9f0ceb8c4610c898fcc57f864ed858faf9d4e587c458abcce457",
+	dmq1: "5e93758bf753866175e4d71ea8831d5c87675512732ee220d6f4e6b1ecfacc6b",
+	coeff: "8aed77d6152068983c9b93a9109c1a32bf98ca58163053742ed53c4f554198be",
+}
+
+var private = new cryptico.RSAKey();
+private.setPrivateEx(p.n, p.e, p.d, p.p, p.q, p.dmp1, p.dmq1, p.coeff);
+
+var public_key_string = cryptico.publicKeyString(private);  
+
+var text = "Matt, I need you to help me with my Starcraft strategy.";
+var res_encrypt = cryptico.encrypt(text, public_key_string);
+var res_descrypt = cryptico.decrypt(res_encrypt.cipher, private);
+console.log(res_encrypt, res_descrypt);
+
+document.write(''
+	+ 'PUBLIC KEY STRING: ' + public_key_string +'\n'
+	+ 'CIPHER: ' + res_encrypt.cipher +'\n'
+	+ 'DECRYPTED: ' + res_descrypt.plaintext +'\n'
+	);
+
+
+
+// MESSAGE ENCRYPT/DECRYPT
+
+var res_encrypt = cryptico.encrypt('JS says: "Hello PHP!" (2éó)', 'uMdDWO5ZwAPo6upkVZPEVjBUpBapG+7NA7Iy8jaSw2oKBW+xQqANY+RsA0yGYZS8vY2lnpt4Xmg1/WFuDZkVdw==');
+
+var res_descrypt = cryptico.decrypt(
+	'LW09zkJtUx7D6HJPAongbAjqrhOa/dNwMrCjTNfu4MxJLnsNup94i3287nep4/gy74JslASmO26VV2e3yPS2dg==?Gct9b7zGFinyGVbsJICnyDr5JB7Mz4lDXVKKLm0p2eABWv5AmTfe12FIEcZzpNZT'
+	, private);
+
+document.write(''
+	+ '\n'
+	+ 'CIPHER FOR PHP: ' + res_encrypt.cipher + '\n'
+	+ 'DECRYPTED FROM PHP: ' + res_descrypt.plaintext + '\n'
+	);
+console.log(res_descrypt.plaintext.trim())
+
+</script>

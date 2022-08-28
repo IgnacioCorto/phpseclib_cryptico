@@ -1,0 +1,30 @@
+--- vendor/phpseclib/phpseclib/phpseclib/Crypt/RSA.php.old	2022-08-19 23:41:00.350860400 -0400
++++ vendor/phpseclib/phpseclib/phpseclib/Crypt/RSA.php	2022-08-19 23:42:32.044864800 -0400
+@@ -370,7 +370,12 @@
+         do {
+             for ($i = 1; $i <= $num_primes; $i++) {
+                 if ($i != $num_primes) {
+-                    $primes[$i] = BigInteger::randomPrime($regSize);
++
++                    do {
++                        $primes[$i] = BigInteger::randomPrime($regSize);
++                        list(, $rema) = $primes[$i]->divide($e);
++                    } while($rema->compare(self::$one) <= 0);
++
+                 } else {
+                     extract(BigInteger::minMaxBits($bits));
+                     /** @var BigInteger $min
+@@ -379,7 +384,12 @@
+                     list($min) = $min->divide($n);
+                     $min = $min->add(self::$one);
+                     list($max) = $max->divide($n);
+-                    $primes[$i] = BigInteger::randomRangePrime($min, $max);
++
++                    do {
++                        $primes[$i] = BigInteger::randomRangePrime($min, $max);
++                        list(, $rema) = $primes[$i]->divide($e);
++                    } while($rema->compare(self::$one) <= 0);
++
+                 }
+ 
+                 // the first coefficient is calculated differently from the rest
